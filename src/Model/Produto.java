@@ -4,14 +4,14 @@ package Model;
 public class Produto {
     private int id;
     private String nome;
-    private int valor;
+    private String valor;
     private String status;
     
     public Produto(){
         
     }
 
-    public Produto(int id, String nome, int valor, String status) {
+    public Produto(int id, String nome, String valor, String status) {
         this.id = id;
         this.nome = nome;
         this.valor = valor;
@@ -34,11 +34,11 @@ public class Produto {
         this.nome = nome;
     }
 
-    public int getValor() {
+    public String getValor() {
         return valor;
     }
 
-    public void setValor(int valor) {
+    public void setValor(String valor) {
         this.valor = valor;
     }
 

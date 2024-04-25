@@ -5,6 +5,10 @@
 package View;
 
 import Model.Produto;
+import Model.ProdutoDAO;
+import java.sql.SQLException;
+import java.util.logging.Level;
+import java.util.logging.Logger;
 import javax.swing.JOptionPane;
 
 /**
@@ -41,6 +45,7 @@ public class Tela_inicial extends javax.swing.JFrame {
         aviso1 = new javax.swing.JLabel();
         aviso2 = new javax.swing.JLabel();
         aviso3 = new javax.swing.JLabel();
+        jButton1 = new javax.swing.JButton();
 
         setDefaultCloseOperation(javax.swing.WindowConstants.EXIT_ON_CLOSE);
 
@@ -92,6 +97,14 @@ public class Tela_inicial extends javax.swing.JFrame {
         aviso3.setForeground(new java.awt.Color(255, 51, 51));
         aviso3.setText("Status invalido, não digite números ");
 
+        jButton1.setFont(new java.awt.Font("Segoe UI", 0, 18)); // NOI18N
+        jButton1.setText("LISTA");
+        jButton1.addActionListener(new java.awt.event.ActionListener() {
+            public void actionPerformed(java.awt.event.ActionEvent evt) {
+                jButton1ActionPerformed(evt);
+            }
+        });
+
         javax.swing.GroupLayout layout = new javax.swing.GroupLayout(getContentPane());
         getContentPane().setLayout(layout);
         layout.setHorizontalGroup(
@@ -102,7 +115,6 @@ public class Tela_inicial extends javax.swing.JFrame {
                     .addComponent(aviso3)
                     .addComponent(aviso2)
                     .addComponent(valor_txt, javax.swing.GroupLayout.PREFERRED_SIZE, 280, javax.swing.GroupLayout.PREFERRED_SIZE)
-                    .addComponent(status_txt, javax.swing.GroupLayout.PREFERRED_SIZE, 280, javax.swing.GroupLayout.PREFERRED_SIZE)
                     .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
                         .addGroup(javax.swing.GroupLayout.Alignment.TRAILING, layout.createSequentialGroup()
                             .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
@@ -117,9 +129,6 @@ public class Tela_inicial extends javax.swing.JFrame {
                                 .addComponent(aviso1))
                             .addGap(164, 164, 164))
                         .addGroup(javax.swing.GroupLayout.Alignment.TRAILING, layout.createSequentialGroup()
-                            .addComponent(salvar_btn)
-                            .addGap(257, 257, 257))
-                        .addGroup(javax.swing.GroupLayout.Alignment.TRAILING, layout.createSequentialGroup()
                             .addComponent(jLabel5)
                             .addGap(281, 281, 281))
                         .addGroup(javax.swing.GroupLayout.Alignment.TRAILING, layout.createSequentialGroup()
@@ -127,7 +136,13 @@ public class Tela_inicial extends javax.swing.JFrame {
                             .addGap(275, 275, 275))
                         .addGroup(javax.swing.GroupLayout.Alignment.TRAILING, layout.createSequentialGroup()
                             .addComponent(jLabel3)
-                            .addGap(300, 300, 300)))))
+                            .addGap(300, 300, 300)))
+                    .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.TRAILING, false)
+                        .addGroup(layout.createSequentialGroup()
+                            .addComponent(salvar_btn)
+                            .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
+                            .addComponent(jButton1))
+                        .addComponent(status_txt, javax.swing.GroupLayout.Alignment.LEADING, javax.swing.GroupLayout.PREFERRED_SIZE, 280, javax.swing.GroupLayout.PREFERRED_SIZE))))
         );
         layout.setVerticalGroup(
             layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
@@ -154,8 +169,10 @@ public class Tela_inicial extends javax.swing.JFrame {
                 .addComponent(status_txt, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
                 .addGap(18, 18, 18)
                 .addComponent(aviso3)
-                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED, 50, Short.MAX_VALUE)
-                .addComponent(salvar_btn, javax.swing.GroupLayout.PREFERRED_SIZE, 38, javax.swing.GroupLayout.PREFERRED_SIZE)
+                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED, 78, Short.MAX_VALUE)
+                .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
+                    .addComponent(salvar_btn, javax.swing.GroupLayout.PREFERRED_SIZE, 38, javax.swing.GroupLayout.PREFERRED_SIZE)
+                    .addComponent(jButton1, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE))
                 .addContainerGap())
         );
 
@@ -170,31 +187,22 @@ public class Tela_inicial extends javax.swing.JFrame {
     private void salvar_btnActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_salvar_btnActionPerformed
        Produto p = new Produto();
        try{
-       String valorstr = valor_txt.getText();
+       p.setValor(valor_txt.getText());
        p.setNome(item_txt.getText());
        p.setStatus(status_txt.getText());
-       
-       
-        if(valorstr.isBlank()|| valorstr.isEmpty()){
-           aviso2.setVisible(true);
-       }
-        //p.setValor(Integer.parseInt(valorstr));
        }catch (NumberFormatException e){
             JOptionPane.showMessageDialog(null, "Dados Invalidos", "Erro ao salvar" ,JOptionPane.ERROR_MESSAGE);
             System.out.println(e);
        }
-        
-       if(p.getNome().isBlank()|| p.getNome().isEmpty()){
-           aviso1.setVisible(true);
-       }
-        
-        String valorstr = valor_txt.getText();
-        if(p.getStatus().isBlank()|| p.getStatus().isEmpty()){
-           aviso3.setVisible(true);   
-           
-       }if(p.getNome().matches("[a-zA-Z- \\p{L}]+") && p.getStatus().matches("[a-zA-Z- \\p{L}]+") && valorstr.matches("[1-9][0-9]*" )){
-           avisos();
-           JOptionPane.showMessageDialog(null, "Salvo corretamente!");
+       if(p.getNome().matches("[a-zA-Z- \\p{L}]+") && p.getStatus().matches("[a-zA-Z- \\p{L}]+") && p.getValor().matches("[1-9][0-9]*" )){
+           try {
+               if(ProdutoDAO.cadastrar(p)){
+                   avisos();
+                   JOptionPane.showMessageDialog(null, "Salvo corretamente!");
+               }
+           } catch (SQLException ex) {
+               Logger.getLogger(Tela_inicial.class.getName()).log(Level.SEVERE, null, ex);
+           }
        }
        else{
            if(!p.getNome().matches("[a-zA-Z- \\p{L}]+")){
@@ -209,7 +217,7 @@ public class Tela_inicial extends javax.swing.JFrame {
            else{
                aviso3.setVisible(false);
            }
-           if(!valorstr.matches("[1-9][0-9]*" )){
+           if(!p.getValor().matches("[1-9][0-9]*" )){
            aviso2.setVisible(true);
            }
            else{
@@ -218,6 +226,12 @@ public class Tela_inicial extends javax.swing.JFrame {
        }
         
     }//GEN-LAST:event_salvar_btnActionPerformed
+
+    private void jButton1ActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_jButton1ActionPerformed
+        Lista_Produtos lista_produtos = new Lista_Produtos();
+        lista_produtos.setVisible(true);
+        dispose();
+    }//GEN-LAST:event_jButton1ActionPerformed
 
     /**
      * @param args the command line arguments
@@ -259,6 +273,7 @@ public class Tela_inicial extends javax.swing.JFrame {
     private javax.swing.JLabel aviso2;
     private javax.swing.JLabel aviso3;
     private javax.swing.JTextField item_txt;
+    private javax.swing.JButton jButton1;
     private javax.swing.JLabel jLabel1;
     private javax.swing.JLabel jLabel2;
     private javax.swing.JLabel jLabel3;
